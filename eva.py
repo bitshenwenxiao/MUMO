@@ -38,10 +38,10 @@ def compute_metric_step(positions_result, positions_gt, id_history=None):
     matches, unmatched_result, unmatched_gt = linear_assignment(cost_matrix, thresh=mytresh)
     count_successed = len(matches)
     count_all = len(unmatched_result)+len(unmatched_gt)+count_successed
-    dis = 0
+    dis = (len(unmatched_result) + len(unmatched_gt)) * mytresh
+    #dis = 0
     for id_position_result, id_position_gt in matches:
         dis = compute_dis(positions_result[id_position_result], positions_gt[id_position_gt])+dis
-    dis = (len(unmatched_result)+len(unmatched_gt))*mytresh
     # if a target should be found but not be found, id_switch+1
     # if a target is false target, id_switch+1
     id_switch_step = len(unmatched_gt) + len(unmatched_result)
@@ -56,11 +56,10 @@ def compute_metric_step(positions_result, positions_gt, id_history=None):
     else:
         for [i, j] in matches:
             if id_history[positions_gt[j][0]] != -1:
-                if id_history[positions_gt[j][0]] != positions_result[i][3]:
+                if id_history[positions_gt[j][0]] != positions_result[i][0]:
                 #if id_history[positions_gt[j][0]] != 0:
                     id_switch_step = id_switch_step + 1
             id_history[positions_gt[j][0]] = positions_result[i][0]
-
     return count_successed, count_all, dis, id_switch_step, id_history
 
 def read(path):
@@ -103,10 +102,14 @@ def compute_metric_dataset(path_result, path_gt):
     id_switch = 0
 
     sequences = os.listdir(path_result)
+    sequences.sort()
     for sequence in sequences:
+        #sequence = '46'
+        print('sequence is : %s'%(sequence))
         path_result_sequence = path_result + sequence + '/'
         path_gt_sequence = path_gt + sequence + '/'
         count_successed_sequence, count_all_sequence, dis_sequence, id_switch_sequence = compute_metric_sequence(path_result_sequence, path_gt_sequence)
+        print(count_successed_sequence/count_all_sequence, dis_sequence/count_all_sequence, id_switch_sequence)
         count_successed_dataset = count_successed_dataset + count_successed_sequence
         count_all_dataset = count_all_dataset + count_all_sequence
         dis_dataset = dis_dataset + dis_sequence
@@ -115,6 +118,7 @@ def compute_metric_dataset(path_result, path_gt):
     precision = count_successed_dataset*1.0 / count_all_dataset
     distance = dis_dataset / count_successed_dataset
     return precision, distance, id_switch
+
 
 
 if __name__ == '__main__':
