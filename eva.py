@@ -118,7 +118,7 @@ def compute_metric_dataset(path_result, path_gt):
         id_switch = id_switch + id_switch_sequence
 
     precision = count_successed_dataset*1.0 / count_all_dataset
-    distance = dis_dataset / count_successed_dataset
+    distance = dis_dataset / count_all_dataset
     return precision, distance, id_switch
 
 
