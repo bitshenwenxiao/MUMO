@@ -85,6 +85,8 @@ def compute_metric_sequence(path_result_sequence, path_gt_sequence):
     id_history=None
     files_result = os.listdir(path_result_sequence)
     files_gt = os.listdir(path_gt_sequence)
+    files_result.sort()
+    files_gt.sort()
     for step, file_gt in enumerate(files_gt):
         positions_result = read(path_result_sequence+files_result[step])
         positions_gt = read(path_gt_sequence+files_gt[step])
